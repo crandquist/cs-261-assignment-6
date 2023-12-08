@@ -113,25 +113,29 @@ class HashMap:
         """
         Changes the capacity of the internal hash table.
         """
-        # Check if the new_capacity is less than 1.
         if new_capacity < 1:
-            return # Do nothing.
+            return
 
-        # Ensure new_capacity is prime.
         new_capacity = self._next_prime(new_capacity)
-
-        # Create a new DynamicArray with the updated capacity.
         new_buckets = DynamicArray()
+
+        # Create the new buckets with the updated capacity
         for _ in range(new_capacity):
             new_buckets.append(LinkedList())
 
-        # Rehash existing key / value pairs to the new buckets.
-        for bucket in self._buckets:
-            for node in bucket:
-                index = self._hash_function(node.key) % new_capacity
-                new_buckets[index].insert(node.key, node.value)
+        # Rehash existing key/value pairs to the new buckets
+        for i in range(self._buckets.length()):
+            current_bucket = self._buckets.get_at_index(i)
+            iterator = iter(current_bucket)
+            while True:
+                try:
+                    current_node = next(iterator)
+                    index = self._hash_function(current_node.key) % new_capacity
+                    new_buckets.get_at_index(index).insert(current_node.key, current_node.value)
+                except StopIteration:
+                    break
 
-        # Update the HashMap with the new capacity and buckets.
+        # Update the HashMap with the new capacity and buckets
         self._capacity = new_capacity
         self._buckets = new_buckets
 
