@@ -87,21 +87,71 @@ class HashMap:
 
     def put(self, key: str, value: object) -> None:
         """
-        TODO: Write this implementation
+        Updates the key / value pair in the hash map.
         """
-        pass
+
+        # If table load is greater than or equal to 0.5 then resize table
+        if self.table_load() >= 0.5:
+            self.resize_table(self._capacity * 2)
+
+        hash_key = self._hash_function(key) % self._capacity
+
+        # if the bucket does not contain a key and value then simply insert the key value pair and increment size
+        if self._buckets.get_at_index(hash_key) is None:
+            self._buckets.set_at_index(hash_key, HashEntry(key, value))
+            self._size += 1
+
+        else:
+            j = 1
+            quad_key = hash_key
+            while self._buckets.get_at_index(quad_key):
+                # if the key is found in the hash, then replace without incrementing size and return
+                # if it was previously a tombstone then do increment size
+                if self._buckets.get_at_index(quad_key).key == key:
+                    if self._buckets.get_at_index(quad_key).is_tombstone:
+                        self._buckets.set_at_index(quad_key, HashEntry(key, value))
+                        self._size += 1
+                        self._buckets.get_at_index(quad_key).is_tombstone = False
+                    else:
+                        self._buckets.set_at_index(quad_key, HashEntry(key, value))
+                    return
+                quad_key = (hash_key + j ** 2) % self._capacity
+                j += 1
+
+            self._buckets.set_at_index(quad_key, HashEntry(key, value))
+            self._size += 1
 
     def resize_table(self, new_capacity: int) -> None:
         """
-        TODO: Write this implementation
+        Changes the capacity of the internal hash table.
         """
-        pass
+        if new_capacity <= self._size:
+            return
+
+        if not self._is_prime(new_capacity):
+            new_capacity = self._next_prime(new_capacity)
+
+        new_table = HashMap(new_capacity, self._hash_function)
+
+        # this is to prevent next_prime from going to 3, when it should stay at 2 (since 2 is prime)
+        if new_capacity == 2:
+            new_table._capacity = 2
+
+        # be sure to not add size + 1 if rehashing tombstone values
+        for item in self:
+            if item:
+                new_table.put(item.key, item.value)
+
+        # Reassigning new values to self
+        self._buckets = new_table._buckets
+        self._size = new_table._size
+        self._capacity = new_table.get_capacity()
 
     def table_load(self) -> float:
         """
-        TODO: Write this implementation
+        Returns the current table load factor.
         """
-        pass
+        return self._size / self._capacity
 
     def empty_buckets(self) -> int:
         """
@@ -113,43 +163,74 @@ class HashMap:
         """
         TODO: Write this implementation
         """
-        pass
+        for item in self:
+            if item:
+                if item.key == key and not item.is_tombstone:
+                    return item.value
+
+        return None
 
     def contains_key(self, key: str) -> bool:
         """
         TODO: Write this implementation
         """
-        pass
+        for item in self:
+            if item:
+                if item.key == key and not item.is_tombstone:
+                    return True
+        return False
 
     def remove(self, key: str) -> None:
         """
         TODO: Write this implementation
         """
-        pass
+        for item in self:
+            if item:
+                if item.key == key and not item.is_tombstone:
+                    item.is_tombstone = True
+                    self._size -= 1
 
     def get_keys_and_values(self) -> DynamicArray:
         """
         TODO: Write this implementation
         """
-        pass
+        arr = DynamicArray()
+
+        for item in self:
+            if item and not item.is_tombstone:
+                arr.append((item.key, item.value))
+
+        return arr
 
     def clear(self) -> None:
         """
         TODO: Write this implementation
         """
-        pass
+        self._buckets = DynamicArray()
+        for _ in range(self._capacity):
+            self._buckets.append(None)
+        self._size = 0
 
     def __iter__(self):
         """
         TODO: Write this implementation
         """
-        pass
+        self.index = 0
+        return self
 
     def __next__(self):
         """
         TODO: Write this implementation
         """
-        pass
+        try:
+            value = None
+            while value is None or value.is_tombstone is True:
+                value = self._buckets.get_at_index(self.index)
+                self.index += 1
+        except DynamicArrayException:
+            raise StopIteration
+
+        return value
 
 
 # ------------------- BASIC TESTING ---------------------------------------- #
