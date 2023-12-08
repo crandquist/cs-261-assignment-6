@@ -114,33 +114,34 @@ class HashMap:
         Changes the capacity of the internal hash table.
         """
 
-        # validate new capacity is at least 1, if it is less than 1, then do nothing
-        if new_capacity >= 1:
-            # create a temporary hash map with new_capacity and the same hash function as this object
-            temp = HashMap(new_capacity, self._hash_function)
+        # First, check if new_capacity is less than 1. If it is then do nothing
+        if new_capacity < 1:
+            return
 
-            # loop over the buckets of the current hash map
-            for i in range(self._capacity):
-                bucket = self._buckets.get_at_index(i)  # get the ith list of the hash map
+        # A check for a new capacity with a prime number size
+        if not self._is_prime(new_capacity):
+            new_capacity = self._next_prime(new_capacity)
 
-                # loop over the nodes of ith list
-                for node in bucket:
-                    temp.put(node.key, node.value)  # insert node's key/value pair into the temp hash map
+        # First, create a new Hashmap with the new capacity
+        new_table = HashMap(new_capacity, self._hash_function)
 
-            # update the capacity of self to new_capacity
-            self._capacity = new_capacity
-            self._buckets = DynamicArray()  # create an empty DynamicArray for this buckets
+        # this is to prevent next_prime from going to 3, when it should stay at 2 (since 2 is prime)
+        if new_capacity == 2:
+            new_table._capacity = 2
 
-            # loop over the buckets of the temp object
-            for i in range(temp._capacity):
-                bucket = LinkedList()  # Create a new LinkedList for each bucket in the current hash map
+        for i in range(self._capacity):
+            if self._buckets.get_at_index(i).length() > 0:
+                # chain_key = self._buckets.get_at_index(i).__iter__()
+                for item in self._buckets.get_at_index(i):
+                    new_table.put(item.key, item.value)
+                # for _ in range(self._buckets.get_at_index(i).length()):
+                #     node = chain_key.__next__()
+                #     new_table.put(node.key, node.value)
 
-                original_bucket = temp._buckets.get_at_index(i)
-                if original_bucket:  # Check if the bucket exists in the temporary hash map
-                    for node in original_bucket:
-                        bucket.insert(node.key, node.value)  # Insert key/value pair into the new bucket
-
-                self._buckets.append(bucket)  # insert the new bucket into the buckets array of this object
+        # Reassigning new values to self
+        self._buckets = new_table._buckets
+        self._size = new_table._size
+        self._capacity = new_table._capacity
 
     def table_load(self) -> float:
         """
