@@ -95,13 +95,19 @@ class HashMap:
         index = self._hash_function(key) % self._capacity
         current_bucket = self._buckets[index]
 
-        # Check if the key already exists in the bucket.
-        node = current_bucket.contains(key)
-        if node:
-            node.value = value # Update the value.
+        # Check if key already exists in the bucket.
+        existing_node = current_bucket.contains(key)
+        if existing_node:
+            existing_node.value = value
         else:
-            current_bucket.insert(key, value) # Insert the new key / value pair.
-            self._size += 1 # Increment the size.
+            # Key not found, insert new key-value pair.
+            current_bucket.insert(key, value)
+            self._size += 1
+
+            # Check if the load factor is greater than 1.0.
+            load_factor = self.table_load()
+            if load_factor > 1.0:
+                self.resize_table(self._capacity * 2)
 
     def resize_table(self, new_capacity: int) -> None:
         """
