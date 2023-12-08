@@ -1,9 +1,9 @@
-# Name:
-# OSU Email:
+# Name: Cat Randquist
+# OSU Email: randquic@oregonstate.edu
 # Course: CS261 - Data Structures
-# Assignment:
-# Due Date:
-# Description:
+# Assignment: 6
+# Due Date: 12/7/2023
+# Description: Hash Map implementation using separate chaining
 
 
 from a6_include import (DynamicArray, LinkedList,
@@ -90,21 +90,52 @@ class HashMap:
 
     def put(self, key: str, value: object) -> None:
         """
-        TODO: Write this implementation
+        Update the key / value pair in the hash map.
         """
-        pass
+        index = self._hash_function(key) % self._capacity
+        current_bucket = self._buckets[index]
+
+        # Check if the key already exists in the bucket.
+        node = current_bucket.contains(key)
+        if node:
+            node.value = value # Update the value.
+        else:
+            current_bucket.insert(key, value) # Insert the new key / value pair.
+            self._size += 1 # Increment the size.
 
     def resize_table(self, new_capacity: int) -> None:
         """
-        TODO: Write this implementation
+        Changes the capacity of the internal hash table.
         """
-        pass
+        # Check if the new_capacity is less than 1.
+        if new_capacity < 1:
+            return # Do nothing.
+
+        # Ensure new_capacity is prime.
+        new_capacity = self._next_prime(new_capacity)
+
+        # Create a new DynamicArray with the updated capacity.
+        new_buckets = DynamicArray()
+        for _ in range(new_capacity):
+            new_buckets.append(LinkedList())
+
+        # Rehash existing key / value pairs to the new buckets.
+        for bucket in self._buckets:
+            for node in bucket:
+                index = self._hash_function(node.key) % new_capacity
+                new_buckets[index].insert(node.key, node.value)
+
+        # Update the HashMap with the new capacity and buckets.
+        self._capacity = new_capacity
+        self._buckets = new_buckets
 
     def table_load(self) -> float:
         """
-        TODO: Write this implementation
+        Returns the current hash table load factor.
         """
-        pass
+        # Calculate the load factor.
+        load_factor = self._size / self._capacity
+        return load_factor
 
     def empty_buckets(self) -> int:
         """
