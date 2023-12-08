@@ -124,6 +124,9 @@ class HashMap:
         for _ in range(new_capacity):
             new_buckets.append(LinkedList())
 
+        # Store the current size to calculate the new size after resizing
+        old_size = self._size
+
         # Rehash existing key-value pairs to the new buckets
         for i in range(self._buckets.length()):
             current_bucket = self._buckets.get_at_index(i)
@@ -139,7 +142,8 @@ class HashMap:
         self._size = 0  # Reset the size to zero
         for i in range(self._buckets.length()):
             current_bucket = self._buckets.get_at_index(i)
-            self._size += current_bucket.length()  # Count the number of elements in each bucket
+            for node in current_bucket:
+                self._size += 1  # Count the number of elements in each bucket
 
     def table_load(self) -> float:
         """
