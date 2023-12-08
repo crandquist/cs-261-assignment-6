@@ -222,18 +222,43 @@ class HashMap:
 
     def clear(self) -> None:
         """
-        TODO: Write this implementation
+        Clears the hash map by removing all elements.
         """
-        pass
+        # Create a new empty DynamicArray.
+        self._buckets = DynamicArray()
+
+        # Create new buckets with the default capacity.
+        for _ in range(self._capacity):
+            self._buckets.append(LinkedList())
+        self._size = 0
 
 
 def find_mode(da: DynamicArray) -> tuple[DynamicArray, int]:
     """
-    TODO: Write this implementation
+    Return a tuple containing the mode DynamicArray and its frequency.
     """
-    # if you'd like to use a hash map,
-    # use this instance of your Separate Chaining HashMap
-    map = HashMap()
+    max_freq = 0
+    mode_elements = DynamicArray()
+
+    for i in range(da.length()):
+        current_element = da.get_at_index(i)
+        current_count = 0
+
+        # Count occurrences of the current element in the array
+        for j in range(da.length()):
+            if da.get_at_index(j) == current_element:
+                current_count += 1
+
+        # Update the max frequency and mode_elements
+        if current_count > max_freq:
+            max_freq = current_count
+            mode_elements = DynamicArray([current_element])
+        elif current_count == max_freq and not any(
+                current_element == mode_elements.get_at_index(k) for k in range(mode_elements.length())):
+            mode_elements.append(current_element)
+
+    return mode_elements, max_freq
+
 
 
 # ------------------- BASIC TESTING ---------------------------------------- #
