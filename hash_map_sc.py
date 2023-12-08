@@ -116,10 +116,10 @@ class HashMap:
 
         # validate new capacity is at least 1, if it is less than 1, then do nothing
         if new_capacity >= 1:
-            # create a temporary hash map with new_capacity and same hash function as this object
+            # create a temporary hash map with new_capacity and the same hash function as this object
             temp = HashMap(new_capacity, self._hash_function)
 
-            # loop over the buckets of current hash map
+            # loop over the buckets of the current hash map
             for i in range(self._capacity):
                 bucket = self._buckets.get_at_index(i)  # get the ith list of the hash map
 
@@ -135,7 +135,10 @@ class HashMap:
 
             # Copy the buckets from the temporary map to the resized hash map
             for i in range(temp._capacity):
-                self._buckets.append(temp._buckets.get_at_index(i))
+                if i < self._capacity:
+                    self._buckets.append(temp._buckets.get_at_index(i))
+                else:
+                    self._buckets.append(LinkedList())  # Fill in with empty buckets if needed
 
     def table_load(self) -> float:
         """
