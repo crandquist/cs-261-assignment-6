@@ -1,9 +1,9 @@
-# Name:
-# OSU Email:
+# Name: Cat Randquist
+# OSU Email: randquic@oregonstate.edu
 # Course: CS261 - Data Structures
-# Assignment:
-# Due Date:
-# Description:
+# Assignment: 6
+# Due Date: 12/7/2023
+# Description: Implementation of a hash map using open addressing
 
 from a6_include import (DynamicArray, DynamicArrayException, HashEntry,
                         hash_function_1, hash_function_2)
