@@ -114,31 +114,33 @@ class HashMap:
         Changes the capacity of the internal hash table.
         """
 
-        # validate new capacity is at least 1, if it is less than 1, then do nothing
-        if new_capacity >= 1:
-            # create a temporary hash map with new_capacity and the same hash function as this object
-            temp = HashMap(new_capacity, self._hash_function)
+        if new_capacity < 1:
+            return
 
-            # loop over the buckets of the current hash map
-            for i in range(self._capacity):
-                bucket = self._buckets.get_at_index(i)  # get the ith list of the hash map
+        # create a temporary hash map with new_capacity and the same hash function as this object
+        temp = HashMap(new_capacity, self._hash_function)
 
-                # loop over the nodes of ith list
-                for node in bucket:
-                    temp.put(node.key, node.value)  # insert node's key/value pair into temp hash map
+        # loop over the buckets of the current hash map
+        for i in range(self._capacity):
+            bucket = self._buckets.get_at_index(i)
 
-            # Update the hash map's capacity after copying the elements
-            self._capacity = new_capacity
+            # loop over the nodes of ith list
+            for node in bucket:
+                temp.put(node.key, node.value)  # insert node's key/value pair into temp hash map
 
-            # Clear the current data before updating with new data
-            self._buckets = DynamicArray()
+        # Clear the current data before updating with new data
+        self._buckets = DynamicArray()
+        self._size = 0
 
-            # Copy the buckets from the temporary map to the resized hash map
-            for i in range(temp._capacity):
-                if i < self._capacity:
-                    self._buckets.append(temp._buckets.get_at_index(i))
-                else:
-                    self._buckets.append(LinkedList())  # Fill in with empty buckets if needed
+        # Update the hash map's capacity after copying the elements
+        self._capacity = new_capacity
+
+        # Copy the buckets from the temporary map to the resized hash map
+        for i in range(temp._capacity):
+            if i < self._capacity:
+                self._buckets.append(temp._buckets.get_at_index(i))
+            else:
+                self._buckets.append(LinkedList())  # Fill in with empty buckets if needed
 
     def table_load(self) -> float:
         """
