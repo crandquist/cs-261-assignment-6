@@ -147,10 +147,19 @@ class HashMap:
         """
         Returns the number of empty buckets in the hash table.
         """
+        # Initialize a counter for empty buckets.
         empty_buckets = 0
-        for bucket in self._buckets:
-            if bucket.length() == 0:
+
+        # Iterate through the buckets and count the empty ones.
+        index = 0
+        while index < self._buckets.length():
+            if self._buckets.get_at_index(index).length() == 0:
                 empty_buckets += 1
+
+            # Move to the next bucket.
+            index += 1
+
+        # Return the number of empty buckets.
         return empty_buckets
 
     def get(self, key: str):
