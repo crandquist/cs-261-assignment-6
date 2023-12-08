@@ -111,37 +111,31 @@ class HashMap:
 
     def resize_table(self, new_capacity: int) -> None:
         """
-        Change the capacity of the internal hash table.
-        Rehash all existing key/value pairs accordingly.
+        Changes the capacity of the internal hash table.
         """
 
-        # First check if the new_capacity is less than 1, if so, do nothing
-        if new_capacity < 1:
-            return
+        # validate new capacity is at least 1, if it is less than 1, then do nothing
+        if new_capacity >= 1:
+            # create a temporary hash map with new_capacity and same hash function as this object
+            temp = HashMap(new_capacity, self._hash_function)
 
-        # If new_capacity is 1 or more, ensure it's a prime number
-        new_capacity = self._next_prime(new_capacity)
+            # loop over the buckets of current hash map
+            for i in range(self._capacity):
+                bucket = self._buckets.get_at_index(i)  # get the ith list of the hash map
 
-        # Create a new list representing the updated buckets
-        new_buckets = DynamicArray([LinkedList() for _ in range(new_capacity)])
+                # loop over the nodes of ith list
+                for node in bucket:
+                    temp.put(node.key,
+                             node.value)  # insert node's key/value pair into temp hash map. Assuming put function is already implemented.
 
-        # Rehash all existing key/value pairs
-        index = 0
-        while index < self._buckets.length():
-            current_bucket = self._buckets.get_at_index(index)
-            current_node = current_bucket._head
+            # update capacity of self to new_capacity
+            self._capacity = new_capacity
+            self._buckets = DynamicArray()  # create an empty DynamicArray for this buckets
 
-            while current_node:
-                hash_value = self._hash_function(current_node.key)
-                new_index = hash_value % new_capacity
-                new_buckets.get_at_index(new_index).insert(current_node.key, current_node.value)
-                current_node = current_node.next
-
-            index += 1
-
-        # Update the HashMap with the new capacity and buckets
-        self._capacity = new_capacity
-        self._buckets = new_buckets
+            # loop over the buckets of temp object
+            for i in range(temp._capacity):
+                self._buckets.append(
+                    temp._buckets.get_at_index(i))  # insert the ith bucket list into the buckets array of this object
 
     def table_load(self) -> float:
         """
