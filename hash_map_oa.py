@@ -157,7 +157,7 @@ class HashMap:
         """
         TODO: Write this implementation
         """
-        pass
+        return self._capacity - self._size
 
     def get(self, key: str) -> object:
         """
