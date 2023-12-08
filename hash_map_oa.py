@@ -86,27 +86,22 @@ class HashMap:
     # ------------------------------------------------------------------ #
 
     def put(self, key: str, value: object) -> None:
-        """
-        Updates the key / value pair in the hash map.
-        """
-
-        # If table load is greater than or equal to 0.5 then resize table
+        """Updates key/value pair & manages table load."""
+        # Check table load; resize if needed
         if self.table_load() >= 0.5:
             self.resize_table(self._capacity * 2)
 
         hash_key = self._hash_function(key) % self._capacity
 
-        # if the bucket does not contain a key and value then simply insert the key value pair and increment size
+        # Insert or update key-value pair
         if self._buckets.get_at_index(hash_key) is None:
             self._buckets.set_at_index(hash_key, HashEntry(key, value))
             self._size += 1
-
         else:
             j = 1
             quad_key = hash_key
             while self._buckets.get_at_index(quad_key):
-                # if the key is found in the hash, then replace without incrementing size and return
-                # if it was previously a tombstone then do increment size
+                # Search for key; update or insert accordingly
                 if self._buckets.get_at_index(quad_key).key == key:
                     if self._buckets.get_at_index(quad_key).is_tombstone:
                         self._buckets.set_at_index(quad_key, HashEntry(key, value))
@@ -122,9 +117,8 @@ class HashMap:
             self._size += 1
 
     def resize_table(self, new_capacity: int) -> None:
-        """
-        Changes the capacity of the internal hash table.
-        """
+        """Changes capacity of internal hash table."""
+        # Check if new capacity is valid
         if new_capacity <= self._size:
             return
 
@@ -133,16 +127,16 @@ class HashMap:
 
         new_table = HashMap(new_capacity, self._hash_function)
 
-        # this is to prevent next_prime from going to 3, when it should stay at 2 (since 2 is prime)
+        # Handle special case for new_capacity == 2
         if new_capacity == 2:
             new_table._capacity = 2
 
-        # be sure to not add size + 1 if rehashing tombstone values
+        # Rehash entries and update size
         for item in self:
             if item:
                 new_table.put(item.key, item.value)
 
-        # Reassigning new values to self
+        # Reassign new values
         self._buckets = new_table._buckets
         self._size = new_table._size
         self._capacity = new_table.get_capacity()
@@ -155,13 +149,13 @@ class HashMap:
 
     def empty_buckets(self) -> int:
         """
-        TODO: Write this implementation
+        Returns the number of empty buckets in the HashMap.
         """
         return self._capacity - self._size
 
     def get(self, key: str) -> object:
         """
-        TODO: Write this implementation
+        Returns the value associated with the given key.
         """
         for item in self:
             if item:
@@ -172,7 +166,7 @@ class HashMap:
 
     def contains_key(self, key: str) -> bool:
         """
-        TODO: Write this implementation
+        Returns True if the given key is in the HashMap, otherwise it returns False.
         """
         for item in self:
             if item:
@@ -182,7 +176,7 @@ class HashMap:
 
     def remove(self, key: str) -> None:
         """
-        TODO: Write this implementation
+        Removes the given key and its associated value from the HashMap.
         """
         for item in self:
             if item:
@@ -192,7 +186,7 @@ class HashMap:
 
     def get_keys_and_values(self) -> DynamicArray:
         """
-        TODO: Write this implementation
+        Returns a DynamicArray that contains all the keys and values stored in the HashMap.
         """
         arr = DynamicArray()
 
@@ -204,7 +198,7 @@ class HashMap:
 
     def clear(self) -> None:
         """
-        TODO: Write this implementation
+        Empties the HashMap.
         """
         self._buckets = DynamicArray()
         for _ in range(self._capacity):
@@ -213,14 +207,15 @@ class HashMap:
 
     def __iter__(self):
         """
-        TODO: Write this implementation
+        Enables iteration over HashMap.
         """
         self.index = 0
         return self
 
     def __next__(self):
         """
-        TODO: Write this implementation
+        Returns the next item in the HashMap based on the current location of the
+        iterator.
         """
         try:
             value = None
