@@ -138,9 +138,13 @@ class HashMap:
         self._capacity = new_capacity
         self._buckets = new_buckets
 
-        # Update the size after redistributing elements
-        # Calculate the actual number of elements in the new structure
-        self._size = old_size  # Update with the accurate number of elements after redistribution
+        # Recalculate the size after redistributing elements
+        self._size = 0  # Reset the size to zero
+        for i in range(self._buckets.length()):
+            current_bucket = self._buckets.get_at_index(i)
+            self._size += current_bucket.length()  # Count the number of elements in each bucket
+
+        # Update the size attribute with the accurate number of elements after redistribution
 
     def table_load(self) -> float:
         """
