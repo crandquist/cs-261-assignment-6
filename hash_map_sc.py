@@ -206,9 +206,19 @@ class HashMap:
 
     def get_keys_and_values(self) -> DynamicArray:
         """
-        TODO: Write this implementation
+        Returns a DynamicArray containing tuples of keys and their values.
         """
-        pass
+        keys_and_values = DynamicArray()
+
+        # Iterate through each bucket in the hash map.
+        for i in range(self._buckets.length()):
+            current_bucket = self._buckets.get_at_index(i)
+
+            # Iterate through each node in the bucket.
+            for node in current_bucket:
+                keys_and_values.append((node.key, node.value))
+
+        return keys_and_values
 
     def clear(self) -> None:
         """
