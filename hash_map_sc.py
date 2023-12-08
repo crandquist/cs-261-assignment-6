@@ -126,14 +126,9 @@ class HashMap:
         # Rehash existing key/value pairs to the new buckets
         for i in range(self._buckets.length()):
             current_bucket = self._buckets.get_at_index(i)
-            iterator = iter(current_bucket)
-            while True:
-                try:
-                    current_node = next(iterator)
-                    index = self._hash_function(current_node.key) % new_capacity
-                    new_buckets.get_at_index(index).insert(current_node.key, current_node.value)
-                except StopIteration:
-                    break
+            for node in current_bucket:
+                index = self._hash_function(node.key) % new_capacity
+                new_buckets.get_at_index(index).insert(node.key, node.value)
 
         # Update the HashMap with the new capacity and buckets
         self._capacity = new_capacity
@@ -174,9 +169,17 @@ class HashMap:
 
     def contains_key(self, key: str) -> bool:
         """
-        TODO: Write this implementation
+        Checks if a key exists in the hash map.
         """
-        pass
+        index = self._hash_function(key) % self._capacity
+        current_bucket = self._buckets.get_at_index(index)
+
+        # Check if key already exists in the bucket.
+        existing_node = current_bucket.contains(key)
+        if existing_node:
+            return True
+        else:
+            return False
 
     def remove(self, key: str) -> None:
         """
