@@ -191,9 +191,18 @@ class HashMap:
 
     def remove(self, key: str) -> None:
         """
-        TODO: Write this implementation
+        Removes the key-value pair associated with the given key.
         """
-        pass
+        index = self._hash_function(key) % self._capacity
+        current_bucket = self._buckets.get_at_index(index)
+
+        # Find the node containing the key in the bucket.
+        node = current_bucket.contains(key)
+
+        # Remove the node if it exists and decrement the size.
+        if node:
+            current_bucket.remove(key)
+            self._size -= 1
 
     def get_keys_and_values(self) -> DynamicArray:
         """
