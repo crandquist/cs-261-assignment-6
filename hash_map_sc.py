@@ -92,22 +92,26 @@ class HashMap:
         """
         Update the key / value pair in the hash map.
         """
-        index = self._hash_function(key) % self._capacity
-        current_bucket = self._buckets[index]
+        if self.table_load() >= 1.0:
+            self.resize_table(self._capacity * 2)
 
-        # Check if key already exists in the bucket.
-        existing_node = current_bucket.contains(key)
-        if existing_node:
-            existing_node.value = value
-        else:
-            # Key not found, insert new key-value pair.
-            current_bucket.insert(key, value)
+        hash_key = self._hash_function(key) % self._capacity
+        chain_key = self._buckets.get_at_index(hash_key)
+
+        # If the key in the hash map does not yet exist, then simply add the key to the corresponding bucket
+        # and its value, which will be a linked list node.
+        if chain_key.length() == 0:
+            chain_key.insert(key, value)
             self._size += 1
-
-            # Check if the load factor is greater than 1.0.
-            load_factor = self.table_load()
-            if load_factor > 1.0:
-                self.resize_table(self._capacity * 2)
+        else:
+            # iterate through the linked list and check if the same key exists. If it does then do nothing
+            for item in chain_key:
+                if item.key == key:
+                    chain_key.remove(key)
+                    chain_key.insert(key, value)
+                    return
+            chain_key.insert(key, value)
+            self._size += 1
 
     def resize_table(self, new_capacity: int) -> None:
         """
