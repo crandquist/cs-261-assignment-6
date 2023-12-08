@@ -125,17 +125,17 @@ class HashMap:
 
                 # loop over the nodes of ith list
                 for node in bucket:
-                    temp.put(node.key,
-                             node.value)  # insert node's key/value pair into temp hash map. Assuming put function is already implemented.
+                    temp.put(node.key, node.value)  # insert node's key/value pair into temp hash map
 
-            # update capacity of self to new_capacity
+            # Update the hash map's capacity after copying the elements
             self._capacity = new_capacity
-            self._buckets = DynamicArray()  # create an empty DynamicArray for this buckets
 
-            # loop over the buckets of temp object
+            # Clear the current data before updating with new data
+            self._buckets = DynamicArray()
+
+            # Copy the buckets from the temporary map to the resized hash map
             for i in range(temp._capacity):
-                self._buckets.append(
-                    temp._buckets.get_at_index(i))  # insert the ith bucket list into the buckets array of this object
+                self._buckets.append(temp._buckets.get_at_index(i))
 
     def table_load(self) -> float:
         """
