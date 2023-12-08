@@ -163,9 +163,17 @@ class HashMap:
 
     def get(self, key: str):
         """
-        TODO: Write this implementation
+        Retrieves the value associated with the given key.
         """
-        pass
+        index = self._hash_function(key) % self._capacity
+        current_bucket = self._buckets.get_at_index(index)
+
+        # Check if key exists in the bucket.
+        existing_node = current_bucket.contains(key)
+        if existing_node:
+            return existing_node.value
+        else:
+            return None
 
     def contains_key(self, key: str) -> bool:
         """
