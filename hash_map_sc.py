@@ -111,38 +111,32 @@ class HashMap:
 
     def resize_table(self, new_capacity: int) -> None:
         """
-        Changes the capacity of the internal hash table.
+        Change the capacity of the internal hash table.
+        Rehash all existing key/value pairs accordingly.
         """
+
+        # First check if the new_capacity is less than 1, if so, do nothing
         if new_capacity < 1:
-            return  # Do nothing if the new capacity is less than 1
+            return
 
-        prime_capacity = self._next_prime(new_capacity)  # Ensure the new capacity is a prime number
+        # If new_capacity is 1 or more, ensure it's a prime number
+        new_capacity = self._next_prime(new_capacity)
 
-        new_buckets = DynamicArray()
+        # Create a new list representing the updated buckets
+        new_buckets = [LinkedList() for _ in range(new_capacity)]
 
-        # Create the new buckets with the updated capacity
-        for _ in range(prime_capacity):
-            new_buckets.append(LinkedList())
-
-        # Store the current size to calculate the new size after resizing
-        old_size = self._size
-
-        # Rehash existing key-value pairs to the new buckets
-        for i in range(self._buckets.length()):
-            current_bucket = self._buckets.get_at_index(i)
-            for node in current_bucket:
-                index = self._hash_function(node.key) % prime_capacity
-                new_buckets.get_at_index(index).insert(node.key, node.value)
+        # Rehash all existing key/value pairs
+        for bucket_index in range(self._capacity):
+            current_bucket = self._buckets[bucket_index]
+            current_node = current_bucket._head
+            while current_node:
+                index = self._hash_function(current_node.key) % new_capacity
+                new_buckets[index].insert(current_node.key, current_node.value)
+                current_node = current_node.next
 
         # Update the HashMap with the new capacity and buckets
-        self._capacity = prime_capacity
-        self._buckets = new_buckets
-
-        # Recalculate the size after redistributing elements
-        self._size = 0  # Reset the size to zero
-        for i in range(self._buckets.length()):
-            current_bucket = self._buckets.get_at_index(i)
-            self._size += current_bucket.length()  # Count the number of elements in each bucket
+        self._buckets = DynamicArray(new_buckets)
+        self._capacity = new_capacity
 
     def table_load(self) -> float:
         """
