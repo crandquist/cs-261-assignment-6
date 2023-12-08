@@ -90,74 +90,78 @@ class HashMap:
 
     def put(self, key: str, value: object) -> None:
         """
-        Update the key / value pair in the hash map.
+        Update the key/value pair in the hash map.
+        If the load factor exceeds 1.0, the table capacity is doubled.
         """
+
+        # Check and resize the table if the load factor exceeds the threshold
         if self.table_load() >= 1.0:
             self.resize_table(self._capacity * 2)
 
+        # Calculate the hash for the key and determine the corresponding bucket
         hash_key = self._hash_function(key) % self._capacity
         chain_key = self._buckets.get_at_index(hash_key)
 
-        # If the key in the hash map does not yet exist, then simply add the key to the corresponding bucket
-        # and its value, which will be a linked list node.
+        # If the bucket is empty, add the key/value pair as a new node in a linked list
         if chain_key.length() == 0:
             chain_key.insert(key, value)
             self._size += 1
         else:
-            # iterate through the linked list and check if the same key exists. If it does then do nothing
+            # Check if the key already exists in the linked list; if so, update its value
             for item in chain_key:
                 if item.key == key:
-                    chain_key.remove(key)
-                    chain_key.insert(key, value)
+                    chain_key.remove(key)  # Remove the existing key/value pair
+                    chain_key.insert(key, value)  # Insert the updated key/value pair
                     return
+            # If the key does not exist in the linked list, add it as a new node
             chain_key.insert(key, value)
             self._size += 1
 
     def resize_table(self, new_capacity: int) -> None:
         """
-        Changes the capacity of the internal hash table.
+        Adjusts the capacity of the internal hash table to a new size.
+        If new_capacity is less than 1, the method does nothing.
         """
 
-        # First, check if new_capacity is less than 1. If it is then do nothing
+        # Ignore resizing if the new capacity is less than 1
         if new_capacity < 1:
             return
 
-        # A check for a new capacity with a prime number size
+        # Ensure the new capacity is a prime number for better hashing distribution
         if not self._is_prime(new_capacity):
             new_capacity = self._next_prime(new_capacity)
 
-        # First, create a new Hashmap with the new capacity
+        # Create a new HashMap instance with the specified new capacity
         new_table = HashMap(new_capacity, self._hash_function)
 
-        # this is to prevent next_prime from going to 3, when it should stay at 2 (since 2 is prime)
+        # Special case: ensure new_capacity stays at 2 if the next prime is 3
         if new_capacity == 2:
             new_table._capacity = 2
 
+        # Rehash existing key-value pairs into the new table
         for i in range(self._capacity):
+            # Check if the bucket at index i in the current table is non-empty
             if self._buckets.get_at_index(i).length() > 0:
-                # chain_key = self._buckets.get_at_index(i).__iter__()
                 for item in self._buckets.get_at_index(i):
+                    # Rehash each key-value pair into the new table
                     new_table.put(item.key, item.value)
-                # for _ in range(self._buckets.get_at_index(i).length()):
-                #     node = chain_key.__next__()
-                #     new_table.put(node.key, node.value)
 
-        # Reassigning new values to self
+        # Update the current table's attributes with the resized table's attributes
         self._buckets = new_table._buckets
         self._size = new_table._size
         self._capacity = new_table._capacity
 
     def table_load(self) -> float:
         """
-        Returns the current hash table load factor.
+        Computes the current hash table load factor.
         """
-        # Calculate the load factor.
+        # Calculate and return the load factor.
         load_factor = self._size / self._capacity
         return load_factor
 
     def empty_buckets(self) -> int:
         """
-        Returns the number of empty buckets in the hash table.
+        Counts the number of empty buckets in the hash table.
         """
         # Initialize a counter for empty buckets.
         empty_buckets = 0
@@ -171,12 +175,12 @@ class HashMap:
             # Move to the next bucket.
             index += 1
 
-        # Return the number of empty buckets.
+        # Return the count of empty buckets.
         return empty_buckets
 
     def get(self, key: str):
         """
-        Retrieves the value associated with the given key.
+        Retrieves the value associated with the given key from the hash map.
         """
         index = self._hash_function(key) % self._capacity
         current_bucket = self._buckets.get_at_index(index)
@@ -190,12 +194,12 @@ class HashMap:
 
     def contains_key(self, key: str) -> bool:
         """
-        Checks if a key exists in the hash map.
+        Checks if the given key exists in the hash map.
         """
         index = self._hash_function(key) % self._capacity
         current_bucket = self._buckets.get_at_index(index)
 
-        # Check if key already exists in the bucket.
+        # Check if key exists in the bucket.
         existing_node = current_bucket.contains(key)
         if existing_node:
             return True
@@ -204,7 +208,7 @@ class HashMap:
 
     def remove(self, key: str) -> None:
         """
-        Removes the key-value pair associated with the given key.
+        Removes the key-value pair associated with the given key from the hash map.
         """
         index = self._hash_function(key) % self._capacity
         current_bucket = self._buckets.get_at_index(index)
@@ -219,7 +223,7 @@ class HashMap:
 
     def get_keys_and_values(self) -> DynamicArray:
         """
-        Returns a DynamicArray containing tuples of keys and their values.
+        Returns a DynamicArray containing tuples of keys and their corresponding values from the hash map.
         """
         keys_and_values = DynamicArray()
 
@@ -237,7 +241,7 @@ class HashMap:
         """
         Clears the hash map by removing all elements.
         """
-        # Create a new empty DynamicArray.
+        # Create a new empty DynamicArray for buckets.
         self._buckets = DynamicArray()
 
         # Create new buckets with the default capacity.
@@ -245,10 +249,9 @@ class HashMap:
             self._buckets.append(LinkedList())
         self._size = 0
 
-
 def find_mode(da: DynamicArray) -> tuple[DynamicArray, int]:
     """
-    Return a tuple containing the mode DynamicArray and its frequency.
+    Returns a tuple containing the mode DynamicArray and its frequency.
     """
     max_freq = 0
     mode_elements = DynamicArray()
@@ -271,7 +274,6 @@ def find_mode(da: DynamicArray) -> tuple[DynamicArray, int]:
             mode_elements.append(current_element)
 
     return mode_elements, max_freq
-
 
 
 # ------------------- BASIC TESTING ---------------------------------------- #
