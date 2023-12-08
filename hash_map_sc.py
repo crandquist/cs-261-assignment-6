@@ -117,11 +117,16 @@ class HashMap:
             return  # Do nothing if the new capacity is less than 1
 
         new_capacity = self._next_prime(new_capacity)  # Ensure the new capacity is a prime number
+        print(f"New Capacity: {new_capacity}")
+
         new_buckets = DynamicArray()
 
         # Create the new buckets with the updated capacity
         for _ in range(new_capacity):
             new_buckets.append(LinkedList())
+
+        # Store the current size to calculate the new size after resizing
+        old_size = self._size
 
         # Rehash existing key-value pairs to the new buckets
         for i in range(self._buckets.length()):
@@ -133,6 +138,12 @@ class HashMap:
         # Update the HashMap with the new capacity and buckets
         self._capacity = new_capacity
         self._buckets = new_buckets
+
+        # Update the size after redistributing elements
+        # Calculate the actual number of elements in the new structure
+        self._size = old_size  # Update with the accurate number of elements after redistribution
+
+        print(f"Updated Capacity: {self._capacity}")
 
     def table_load(self) -> float:
         """
