@@ -123,20 +123,25 @@ class HashMap:
         new_capacity = self._next_prime(new_capacity)
 
         # Create a new list representing the updated buckets
-        new_buckets = [LinkedList() for _ in range(new_capacity)]
+        new_buckets = DynamicArray([LinkedList() for _ in range(new_capacity)])
 
         # Rehash all existing key/value pairs
-        for bucket_index in range(self._capacity):
-            current_bucket = self._buckets[bucket_index]
+        index = 0
+        while index < self._buckets.length():
+            current_bucket = self._buckets.get_at_index(index)
             current_node = current_bucket._head
+
             while current_node:
-                index = self._hash_function(current_node.key) % new_capacity
-                new_buckets[index].insert(current_node.key, current_node.value)
+                hash_value = self._hash_function(current_node.key)
+                new_index = hash_value % new_capacity
+                new_buckets.get_at_index(new_index).insert(current_node.key, current_node.value)
                 current_node = current_node.next
 
+            index += 1
+
         # Update the HashMap with the new capacity and buckets
-        self._buckets = DynamicArray(new_buckets)
         self._capacity = new_capacity
+        self._buckets = new_buckets
 
     def table_load(self) -> float:
         """
