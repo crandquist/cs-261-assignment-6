@@ -142,32 +142,27 @@ class HashMap:
         self._capacity = new_table.get_capacity()
 
     def table_load(self) -> float:
-        """
-        Returns the current table load factor.
-        """
+        """Returns the current table load factor."""
+        # Calculate and return load factor
         return self._size / self._capacity
 
     def empty_buckets(self) -> int:
-        """
-        Returns the number of empty buckets in the HashMap.
-        """
+        """Returns the number of empty buckets."""
+        # Calculate and return empty buckets count
         return self._capacity - self._size
 
     def get(self, key: str) -> object:
-        """
-        Returns the value associated with the given key.
-        """
+        """Returns the value associated with the given key."""
+        # Search for key; return associated value if found
         for item in self:
             if item:
                 if item.key == key and not item.is_tombstone:
                     return item.value
-
         return None
 
     def contains_key(self, key: str) -> bool:
-        """
-        Returns True if the given key is in the HashMap, otherwise it returns False.
-        """
+        """Checks if key exists in the HashMap."""
+        # Search for key; return True if found
         for item in self:
             if item:
                 if item.key == key and not item.is_tombstone:
@@ -175,9 +170,8 @@ class HashMap:
         return False
 
     def remove(self, key: str) -> None:
-        """
-        Removes the given key and its associated value from the HashMap.
-        """
+        """Removes the given key and its value."""
+        # Find key and mark as tombstone
         for item in self:
             if item:
                 if item.key == key and not item.is_tombstone:
@@ -185,44 +179,38 @@ class HashMap:
                     self._size -= 1
 
     def get_keys_and_values(self) -> DynamicArray:
-        """
-        Returns a DynamicArray that contains all the keys and values stored in the HashMap.
-        """
+        """Returns a DynamicArray with keys and values."""
+        # Collect keys and values excluding tombstones
         arr = DynamicArray()
-
         for item in self:
             if item and not item.is_tombstone:
                 arr.append((item.key, item.value))
-
         return arr
 
     def clear(self) -> None:
-        """
-        Empties the HashMap.
-        """
+        """Empties the HashMap."""
+        # Reset buckets to empty, update size to zero
         self._buckets = DynamicArray()
         for _ in range(self._capacity):
             self._buckets.append(None)
         self._size = 0
 
     def __iter__(self):
-        """
-        Enables iteration over HashMap.
-        """
+        """Enables iteration over HashMap."""
+        # Initialize iterator
         self.index = 0
         return self
 
     def __next__(self):
-        """
-        Returns the next item in the HashMap based on the current location of the
-        iterator.
-        """
+        """Returns next item in the HashMap."""
         try:
             value = None
+            # Iterate through non-tombstone entries
             while value is None or value.is_tombstone is True:
                 value = self._buckets.get_at_index(self.index)
                 self.index += 1
         except DynamicArrayException:
+            # Raise StopIteration if end is reached
             raise StopIteration
 
         return value
