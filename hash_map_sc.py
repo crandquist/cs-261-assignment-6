@@ -142,8 +142,7 @@ class HashMap:
         self._size = 0  # Reset the size to zero
         for i in range(self._buckets.length()):
             current_bucket = self._buckets.get_at_index(i)
-            for node in current_bucket:
-                self._size += 1  # Count the number of elements in each bucket
+            self._size += current_bucket.length()  # Count the number of elements in each bucket
 
     def table_load(self) -> float:
         """
