@@ -117,7 +117,6 @@ class HashMap:
             return  # Do nothing if the new capacity is less than 1
 
         new_capacity = self._next_prime(new_capacity)  # Ensure the new capacity is a prime number
-        print(f"New Capacity: {new_capacity}")
 
         new_buckets = DynamicArray()
 
@@ -142,8 +141,6 @@ class HashMap:
         # Update the size after redistributing elements
         # Calculate the actual number of elements in the new structure
         self._size = old_size  # Update with the accurate number of elements after redistribution
-
-        print(f"Updated Capacity: {self._capacity}")
 
     def table_load(self) -> float:
         """
